@@ -18,6 +18,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
 @ParametersAreNonnullByDefault
-package org.sonar.mcp.tools;
+package org.sonar.mcp.serverapi.exception;
 
 import javax.annotation.ParametersAreNonnullByDefault;
