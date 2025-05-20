@@ -53,7 +53,6 @@ import org.sonarsource.sonarlint.core.rpc.protocol.common.Language;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
-import static org.sonar.mcp.analysis.LanguageUtils.getSupportedSonarLanguages;
 
 public class BackendService {
 
@@ -62,7 +61,6 @@ public class BackendService {
 
   private final CompletableFuture<SonarLintRpcServer> backendFuture = new CompletableFuture<>();
   private final String storagePath;
-  private final String pluginPath;
   private final String appVersion;
   private final String userAgent;
   private final String appName;
@@ -71,7 +69,6 @@ public class BackendService {
 
   public BackendService(McpServerLaunchConfiguration mcpConfiguration) {
     this.storagePath = mcpConfiguration.getStoragePath();
-    this.pluginPath = mcpConfiguration.getPluginPath();
     this.appVersion = mcpConfiguration.getAppVersion();
     this.userAgent = mcpConfiguration.getUserAgent();
     this.appName = mcpConfiguration.getAppName();
@@ -80,10 +77,9 @@ public class BackendService {
   }
 
   // For tests
-  BackendService(ClientJsonRpcLauncher launcher, String storagePath, String pluginPath, String appVersion, String appName) {
+  BackendService(ClientJsonRpcLauncher launcher, String storagePath, String appVersion, String appName) {
     this.clientLauncher = launcher;
     this.storagePath = storagePath;
-    this.pluginPath = pluginPath;
     this.appVersion = appVersion;
     this.userAgent = appName + " " + appVersion;
     this.appName = appName;
@@ -148,12 +144,11 @@ public class BackendService {
   }
 
   private CompletableFuture<Void> initRpcServer(SonarLintRpcServer rpcServer) {
-    var pluginResolvedPath = getPluginPath();
-
     var capabilities = EnumSet.of(BackendCapability.FULL_SYNCHRONIZATION, BackendCapability.PROJECT_SYNCHRONIZATION);
     if (isTelemetryEnabled) {
       capabilities.add(BackendCapability.TELEMETRY);
     }
+
     return rpcServer.initialize(
       new InitializeParams(
         new ClientConstantInfoDto(
@@ -168,20 +163,9 @@ public class BackendService {
         capabilities,
         getStoragePath(),
         getWorkDir(),
-        Set.of(pluginResolvedPath.resolve("sonar-go-plugin-1.21.1.1670.jar"),
-          pluginResolvedPath.resolve("sonar-html-plugin-3.19.0.5695.jar"),
-          pluginResolvedPath.resolve("sonar-iac-plugin-1.45.0.14930.jar"),
-          pluginResolvedPath.resolve("sonar-java-plugin-8.13.0.38826.jar"),
-          pluginResolvedPath.resolve("sonar-java-symbolic-execution-plugin-8.13.0.38826.jar"),
-          pluginResolvedPath.resolve("sonar-javascript-plugin-10.22.0.32148.jar"),
-          pluginResolvedPath.resolve("sonar-kotlin-plugin-3.1.0.7071.jar"),
-          pluginResolvedPath.resolve("sonar-php-plugin-3.45.0.12991.jar"),
-          pluginResolvedPath.resolve("sonar-python-plugin-5.3.0.21704.jar"),
-          pluginResolvedPath.resolve("sonar-ruby-plugin-1.18.1.375.jar"),
-          pluginResolvedPath.resolve("sonar-text-plugin-2.22.0.5855.jar"),
-          pluginResolvedPath.resolve("sonar-xml-plugin-2.13.0.5938.jar")),
+        Set.of(),
         Map.of(),
-        getSupportedSonarLanguages(),
+        Set.of(),
         Set.of(),
         emptySet(),
         null,
@@ -198,10 +182,6 @@ public class BackendService {
 
   private Path getStoragePath() {
     return Paths.get(storagePath);
-  }
-
-  private Path getPluginPath() {
-    return Paths.get(pluginPath);
   }
 
   private void projectOpened() {
@@ -230,4 +210,5 @@ public class BackendService {
       }
     }
   }
+
 }

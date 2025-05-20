@@ -30,16 +30,16 @@ public class McpServerLaunchConfiguration {
   private static final String SONARCLOUD_URL = "https://sonarcloud.io";
 
   private static final String STORAGE_PATH = "STORAGE_PATH";
-  private static final String PLUGIN_PATH = "PLUGIN_PATH";
   private static final String SONARQUBE_CLOUD_URL = "SONARQUBE_CLOUD_URL";
   private static final String SONARQUBE_CLOUD_ORG = "SONARQUBE_CLOUD_ORG";
   private static final String SONARQUBE_CLOUD_TOKEN = "SONARQUBE_CLOUD_TOKEN";
   private static final String TELEMETRY_DISABLED = "TELEMETRY_DISABLED";
 
   private final String storagePath;
-  private final String pluginPath;
   private final String sonarqubeCloudUrl;
+  @Nullable
   private final String sonarqubeCloudOrg;
+  @Nullable
   private final String sonarqubeCloudToken;
   private final String appVersion;
   private final String userAgent;
@@ -48,8 +48,6 @@ public class McpServerLaunchConfiguration {
   public McpServerLaunchConfiguration(Map<String, String> environment) {
     this.storagePath = getValueViaEnvOrPropertyOrDefault(environment, STORAGE_PATH, null);
     Objects.requireNonNull(storagePath, "STORAGE_PATH environment variable or property must be set");
-    this.pluginPath = getValueViaEnvOrPropertyOrDefault(environment, PLUGIN_PATH, null);
-    Objects.requireNonNull(pluginPath, "PLUGIN_PATH environment variable or property must be set");
     this.sonarqubeCloudUrl = getValueViaEnvOrPropertyOrDefault(environment, SONARQUBE_CLOUD_URL, SONARCLOUD_URL);
     this.sonarqubeCloudOrg = getValueViaEnvOrPropertyOrDefault(environment, SONARQUBE_CLOUD_ORG, null);
     this.sonarqubeCloudToken = getValueViaEnvOrPropertyOrDefault(environment, SONARQUBE_CLOUD_TOKEN, null);
@@ -64,19 +62,16 @@ public class McpServerLaunchConfiguration {
   }
 
   @NotNull
-  public String getPluginPath() {
-    return pluginPath;
-  }
-
-  @NotNull
   public String getSonarqubeCloudUrl() {
     return sonarqubeCloudUrl;
   }
 
+  @Nullable
   public String getSonarqubeCloudOrg() {
     return sonarqubeCloudOrg;
   }
 
+  @Nullable
   public String getSonarqubeCloudToken() {
     return sonarqubeCloudToken;
   }

@@ -2,30 +2,31 @@
 
 ## Building
 
-The task `preparePlugins` will generate directories for plugins/omnisharp in `build/sonar-mcp-server`.
-
-`build` will generate the Jar file in `build/libs`.
+Run the following Gradle command to clean the project, and build the application:
 
 ```bash
-./gradlew clean build preparePlugins
+./gradlew clean build
 ```
 
-## Running the Application
+The JAR file will be created in `build/libs/`
 
-Once the JAR is built, you can run it using the following command:
+## Running the MCP Server
+
+Once built, you can run the application using:
 
 ```bash
-java                     
--DSTORAGE_PATH=PATH_TO_REPLACE
--DPLUGIN_PATH=PATH_TO_REPLACE
--DSONARQUBE_CLOUD_TOKEN=TOKEN
--DSONARQUBE_CLOUD_ORG=ORG
+java \
+-DSTORAGE_PATH=PATH_TO_REPLACE \
+-DSONARQUBE_CLOUD_TOKEN=TOKEN \
+-DSONARQUBE_CLOUD_ORG=ORG \
 -jar build/libs/sonar-mcp-server-<version>.jar
 ```
 
 Replace `<version>` with the actual version of the JAR file.
 
-## Running as an MCP Server
+## Integration into an MCP Client
+
+Use the following JSON configuration when integrating with an MCP Client:
 
 ```JSON
         {
@@ -37,11 +38,38 @@ Replace `<version>` with the actual version of the JAR file.
                 ],
                 "env": {
                   "STORAGE_PATH": "<path_to_your_mcp_storage>",
-                  "PLUGIN_PATH": "<path_to_the_sonar_plugins>",
                   "SONARQUBE_CLOUD_TOKEN": "<sonarqube_cloud_user_token>",
                   "SONARQUBE_CLOUD_ORG": "<sonarqube_cloud_organization>"
                 }
             }
+        }
+```
+
+## Running the MCP Server with Docker
+
+First, build the Docker image:
+
+```bash
+./gradlew buildDocker
+```
+
+Then, run the image as follows:
+
+```JSON
+        {
+  "sonar-mcp-server-docker": {
+    "command": "docker",
+    "args": [
+      "run",
+      "-i",
+      "--rm",
+      "sonar-mcp-server:<version>"
+    ],
+    "env": {
+      "SONARQUBE_CLOUD_TOKEN": "<token>",
+      "SONARQUBE_CLOUD_ORG": "<org>"
+    }
+  }
         }
 ```
 
