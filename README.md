@@ -118,6 +118,9 @@ Alternatively, you can manually create or update your VS Code MCP configurations
   - `projectKey` - Optional project key - _String_
   - `pullRequest` - Optional pull request ID - _String_
 
+
+- **list_quality_gates** - List all quality gates in the organization
+
 ### Rules
 
 - **list_rule_repositories** - List rule repositories available in SonarQube
