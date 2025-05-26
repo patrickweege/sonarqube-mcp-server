@@ -93,20 +93,13 @@ Alternatively, you can manually create or update your VS Code MCP configurations
 
 ## Tools
 
-### Quality Gates
-
-- **get_quality_gate_status_for_project** - Get the Quality Gate Status for the project
-  - `analysisId` - Optional analysis ID - _String_
-  - `branch` - Optional branch key - _String_
-  - `projectId` - Optional project ID - _String_
-  - `projectKey` - Optional project key - _String_
-  - `pullRequest` - Optional pull request ID - _String_
-
 ### Issues
 
 - **change_sonar_issue_status** - Change the status of a Sonar issue to "accept", "falsepositive" or to "reopen" an issue
   - `key` - Issue key - _Required String_
   - `status` - New issue's status - _Required Enum {"accept", "falsepositive", "reopen"}_
+
+
 - **search_sonar_issues_in_projects** - Search for Sonar issues in my organization's projects
   - `projects` - Optional list of Sonar projects - _String[]_
   - `pullRequestId` - Optional Pull Request's identifier - _String_
@@ -116,7 +109,21 @@ Alternatively, you can manually create or update your VS Code MCP configurations
 - **search_my_sonarqube_cloud_projects** - Find Sonar projects in my organization
   - `page` - Optional page number - _String_
 
+### Quality Gates
+
+- **get_quality_gate_status_for_project** - Get the Quality Gate Status for the project
+  - `analysisId` - Optional analysis ID - _String_
+  - `branch` - Optional branch key - _String_
+  - `projectId` - Optional project ID - _String_
+  - `projectKey` - Optional project key - _String_
+  - `pullRequest` - Optional pull request ID - _String_
+
 ### Rules
+
+- **list_rule_repositories** - List rule repositories available in SonarQube
+  - `language` - Optional language key - _String_
+  - `q` - Optional search query - _String_
+
 
 - **show_rule** - Shows detailed information about a SonarQube rule
   - `key` - Rule key - _Required String_
