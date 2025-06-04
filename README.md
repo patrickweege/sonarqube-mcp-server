@@ -1,6 +1,5 @@
 # SonarQube MCP Server
 
-
 [![Build Status](https://api.cirrus-ci.com/github/SonarSource/sonarqube-mcp-server.svg?branch=master)](https://cirrus-ci.com/github/SonarSource/sonarqube-mcp-server)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=SonarSource_sonar-mcp-server&metric=alert_status&token=364a508a1e77096460f8571d8e66b41c99c95bea)](https://sonarcloud.io/summary/new_code?id=SonarSource_sonarqube-mcp-server)
 
@@ -140,6 +139,20 @@ On top of the previous SonarQube environments, you should add the following vari
 - **search_sonar_issues_in_projects** - Search for SonarQube issues in my organization's projects
   - `projects` - Optional list of Sonar projects - _String[]_
   - `pullRequestId` - Optional Pull Request's identifier - _String_
+
+### Measures
+
+- **get_component_measures** - Get measures for a component (project, directory, file)
+  - `component` - Optional component key to get measures for - _String_
+  - `branch` - Optional branch to analyze for measures - _String_
+  - `metricKeys` - Optional metric keys to retrieve (e.g. nloc, complexity, violations, coverage) - _String[]_
+  - `pullRequest` - Optional pull request identifier to analyze for measures - _String_
+
+### Metrics
+
+- **search_metrics** - Search for metrics
+  - `p` - Optional 1-based page number (default: 1) - _Integer_
+  - `ps` - Optional page size. Must be greater than 0 and less than or equal to 500 (default: 100) - _Integer_
 
 ### Projects
 
