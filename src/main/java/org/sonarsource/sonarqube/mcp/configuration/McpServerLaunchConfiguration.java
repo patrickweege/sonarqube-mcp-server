@@ -17,7 +17,6 @@
 package org.sonarsource.sonarqube.mcp.configuration;
 
 import java.util.Map;
-import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import org.jetbrains.annotations.NotNull;
@@ -26,9 +25,7 @@ import org.sonarsource.sonarqube.mcp.SonarQubeMcpServer;
 public class McpServerLaunchConfiguration {
 
   private static final String APP_NAME = "SonarQube MCP Server";
-
   private static final String SONARCLOUD_URL = "https://sonarcloud.io";
-
   private static final String STORAGE_PATH = "STORAGE_PATH";
   private static final String PLUGINS_PATH = "PLUGINS_PATH";
   private static final String SONARQUBE_URL = "SONARQUBE_URL";
@@ -50,7 +47,9 @@ public class McpServerLaunchConfiguration {
 
   public McpServerLaunchConfiguration(Map<String, String> environment) {
     this.storagePath = getValueViaEnvOrPropertyOrDefault(environment, STORAGE_PATH, null);
-    Objects.requireNonNull(storagePath, "STORAGE_PATH environment variable or property must be set");
+    if (storagePath == null) {
+      throw new IllegalArgumentException("STORAGE_PATH environment variable or property must be set");
+    }
     this.sonarqubeUrl = getValueViaEnvOrPropertyOrDefault(environment, SONARQUBE_URL, SONARCLOUD_URL);
     this.sonarqubeOrg = getValueViaEnvOrPropertyOrDefault(environment, SONARQUBE_ORG, null);
     this.sonarqubeToken = getValueViaEnvOrPropertyOrDefault(environment, SONARQUBE_TOKEN, null);
@@ -114,6 +113,9 @@ public class McpServerLaunchConfiguration {
     if (property == null) {
       property = defaultValue;
     }
+    if (property != null && property.isBlank()) {
+      property = null;
+    }
     return property;
   }
 
@@ -122,7 +124,9 @@ public class McpServerLaunchConfiguration {
     if (implementationVersion == null) {
       implementationVersion = System.getProperty("sonarqube.mcp.server.version");
     }
-    Objects.requireNonNull(implementationVersion, "SonarQube MCP Server version not found");
+    if (implementationVersion == null) {
+      throw new IllegalArgumentException("SonarQube MCP Server version not found");
+    }
     return implementationVersion;
   }
 

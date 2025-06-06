@@ -24,25 +24,26 @@ import io.modelcontextprotocol.spec.McpSchema;
 import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.extension.AfterAllCallback;
+import java.util.UUID;
 import org.junit.jupiter.api.extension.AfterEachCallback;
-import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.support.TypeBasedParameterResolver;
 import org.sonarsource.sonarqube.mcp.SonarQubeMcpServer;
 
-public class SonarQubeMcpServerTestHarness extends TypeBasedParameterResolver<SonarQubeMcpServerTestHarness> implements BeforeAllCallback, AfterEachCallback, AfterAllCallback {
-  private static final Map<String, String> DEFAULT_ENV = Map.of(
-    "STORAGE_PATH", "",
+public class SonarQubeMcpServerTestHarness extends TypeBasedParameterResolver<SonarQubeMcpServerTestHarness> implements AfterEachCallback {
+  private static final Map<String, String> DEFAULT_ENV_TEMPLATE = Map.of(
     "PLUGINS_PATH", "build/sonarqube-mcp-server/plugins",
     "SONARQUBE_URL", "fake.url");
-  private boolean isStatic;
   private final List<McpSyncClient> clients = new ArrayList<>();
+  private Path tempStoragePath;
 
   @Override
   public SonarQubeMcpServerTestHarness resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
@@ -50,27 +51,21 @@ public class SonarQubeMcpServerTestHarness extends TypeBasedParameterResolver<So
   }
 
   @Override
-  public void beforeAll(ExtensionContext context) {
-    isStatic = true;
-  }
-
-  @Override
-  public void afterAll(ExtensionContext context) {
-    if (isStatic) {
-      shutdownAll();
-    }
-  }
-
-  @Override
   public void afterEach(ExtensionContext context) {
-    if (!isStatic) {
-      shutdownAll();
-    }
-  }
-
-  private void shutdownAll() {
     clients.forEach(McpSyncClient::closeGracefully);
     clients.clear();
+    cleanupTempStoragePath();
+  }
+
+  private void cleanupTempStoragePath() {
+    if (tempStoragePath != null && Files.exists(tempStoragePath)) {
+      try {
+        Files.delete(tempStoragePath);
+      } catch (IOException e) {
+        // Ignore cleanup errors
+      }
+      tempStoragePath = null;
+    }
   }
 
   public McpSyncClient newClient() {
@@ -78,13 +73,24 @@ public class SonarQubeMcpServerTestHarness extends TypeBasedParameterResolver<So
   }
 
   public McpSyncClient newClient(Map<String, String> overriddenEnv) {
+    if (overriddenEnv.containsKey("STORAGE_PATH")) {
+      tempStoragePath = Paths.get(overriddenEnv.get("STORAGE_PATH"));
+    } else {
+      try {
+        tempStoragePath = Files.createTempDirectory("sonarqube-mcp-test-storage-" + UUID.randomUUID());
+      } catch (IOException e) {
+        throw new RuntimeException("Failed to create temporary storage directory", e);
+      }
+    }
+    
     McpSyncClient client;
     try {
       var clientToServerOutputStream = new PipedOutputStream();
       var clientToServerInputStream = new PipedInputStream(clientToServerOutputStream);
       var serverToClientOutputStream = new PipedOutputStream();
       var serverToClientInputStream = new PipedInputStream(serverToClientOutputStream);
-      var environment = new HashMap<>(DEFAULT_ENV);
+      var environment = new HashMap<>(DEFAULT_ENV_TEMPLATE);
+      environment.put("STORAGE_PATH", tempStoragePath.toString());
       environment.putAll(overriddenEnv);
       new SonarQubeMcpServer(new StdioServerTransportProvider(new ObjectMapper(), clientToServerInputStream, serverToClientOutputStream), environment).start();
       client = McpClient.sync(new InMemoryClientTransport(serverToClientInputStream, clientToServerOutputStream))
