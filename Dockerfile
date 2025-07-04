@@ -16,6 +16,7 @@ RUN jdeps --ignore-missing-deps -q  \
 RUN "$JAVA_HOME"/bin/jlink \
          --verbose \
          --add-modules $(cat modules.txt) \
+         --add-modules jdk.crypto.cryptoki,jdk.crypto.ec \
          --strip-debug \
          --no-man-pages \
          --no-header-files \
