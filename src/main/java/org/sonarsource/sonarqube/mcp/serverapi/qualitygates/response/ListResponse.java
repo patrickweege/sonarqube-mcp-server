@@ -17,10 +17,30 @@
 package org.sonarsource.sonarqube.mcp.serverapi.qualitygates.response;
 
 import java.util.List;
+import javax.annotation.Nullable;
 
 public record ListResponse(List<QualityGate> qualitygates, long default_id, Actions actions) {
 
-  public record QualityGate(long id, String name, boolean isDefault, boolean isBuiltIn, Actions actions, List<Condition> conditions) {
+  public record QualityGate(
+    String name,
+    boolean isDefault,
+    boolean isBuiltIn,
+    Actions actions,
+    // SQ:S only fields below
+    @Nullable
+    Long id,
+    @Nullable
+    List<Condition> conditions,
+    // SQ:C only fields below
+    @Nullable
+    String caycStatus,
+    @Nullable
+    Boolean hasStandardConditions,
+    @Nullable
+    Boolean hasMQRConditions,
+    @Nullable
+    Boolean isAiCodeSupported
+  ) {
   }
 
   public record Actions(boolean rename, boolean setAsDefault, boolean copy, boolean associateProjects, boolean delete, boolean manageConditions) {
