@@ -16,6 +16,7 @@
  */
 package org.sonarsource.sonarqube.mcp.http;
 
+import java.net.ProxySelector;
 import javax.net.ssl.SSLContext;
 import nl.altindag.ssl.SSLFactory;
 import org.apache.commons.lang3.SystemUtils;
@@ -24,6 +25,7 @@ import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
 import org.apache.hc.client5.http.impl.auth.SystemDefaultCredentialsProvider;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.impl.routing.SystemDefaultRoutePlanner;
 import org.apache.hc.client5.http.ssl.DefaultClientTlsStrategy;
 import org.apache.hc.core5.http2.HttpVersionPolicy;
 import org.apache.hc.core5.io.CloseMode;
@@ -45,6 +47,7 @@ public class HttpClientProvider {
       .addResponseInterceptorFirst(new RedirectInterceptor())
       .setUserAgent(userAgent)
       .setDefaultCredentialsProvider(new SystemDefaultCredentialsProvider())
+      .setRoutePlanner(new SystemDefaultRoutePlanner(ProxySelector.getDefault()))
       .build();
 
     httpClient.start();
