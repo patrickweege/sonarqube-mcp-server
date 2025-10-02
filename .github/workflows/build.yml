@@ -36,4 +36,6 @@ jobs:
 
     # Build Docker image
     - name: Build Docker image
-      run: docker build -t patrickweege/sonarqube-mcp-server:latest -t patrickweege/sonarqube-mcp-server:${APP_VERSION} .	  
+      run: |
+        echo "Building Docker image with tag: patrickweege/sonarqube-mcp-server:${APP_VERSION}"
+        docker build -t patrickweege/sonarqube-mcp-server:latest -t patrickweege/sonarqube-mcp-server:${APP_VERSION} .	  
