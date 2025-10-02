@@ -26,6 +26,7 @@ RUN "$JAVA_HOME"/bin/jlink \
 FROM alpine:3.21.3
 ENV JAVA_HOME=/opt/jdk/jdk-21
 ENV PATH="${JAVA_HOME}/bin:${PATH}"
+ENV JAVA_OPTS=""
 
 COPY --from=builder /optimized-jdk-21 $JAVA_HOME
 
@@ -48,4 +49,4 @@ WORKDIR /app
 ENV STORAGE_PATH=./storage
 LABEL io.modelcontextprotocol.server.name="io.github.SonarSource/sonarqube-mcp-server"
 
-ENTRYPOINT ["/bin/sh", "-c", "/usr/local/bin/install-certificates && exec java -jar /app/sonarqube-mcp-server.jar"]
+ENTRYPOINT ["/bin/sh", "-c", "/usr/local/bin/install-certificates && exec java $JAVA_OPTS -jar /app/sonarqube-mcp-server.jar"]
