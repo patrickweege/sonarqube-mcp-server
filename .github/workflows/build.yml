@@ -29,6 +29,11 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew clean build -x test
 
+    # Extract version from gradle.properties
+    - name: Read application version
+      id: get_version
+      run: echo "APP_VERSION=$(grep '^version=' gradle.properties | cut -d'=' -f2)" >> $GITHUB_ENV	  
+
     # Build Docker image
     - name: Build Docker image
-      run: docker build -t patrickweege/sonarqube-mcp-server:latest .	  
+      run: docker build -t patrickweege/sonarqube-mcp-server:latest -t patrickweege/sonarqube-mcp-server:${APP_VERSION} .	  
